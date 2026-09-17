@@ -11,12 +11,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build DMG
-        run: |
-         chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
-          hdiutil create -volname "Fix Brother Printers for macOS27" \
-            -srcfolder "Fix Brother Printers for macOS27.app" \
-            -ov -format UDZO \
-            "Fix Brother Printers for macOS27.dmg"
+      run: |
+chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
+hdiutil create -volname "Fix Brother Printers for macOS27" \
+-srcfolder "Fix Brother Printers for macOS27.app" \
+-ov -format UDZO \
+"Fix Brother Printers for macOS27.dmg"
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
