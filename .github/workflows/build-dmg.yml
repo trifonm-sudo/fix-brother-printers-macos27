@@ -12,7 +12,7 @@ jobs:
 
       - name: Build DMG
         run: |
-        chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
+          chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
           hdiutil create -volname "Fix Brother Printers for macOS27" \
             -srcfolder "Fix Brother Printers for macOS27.app" \
             -ov -format UDZO \
