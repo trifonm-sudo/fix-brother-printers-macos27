@@ -1,4 +1,4 @@
-name: Build Self-Running Script
+name: Build DMG
 
 on:
   workflow_dispatch:
@@ -7,29 +7,17 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create Self-Running Command File
-        run: |
-          cat << 'EOF' > FixBrotherPrinters.command
-          #!/bin/bash
-          echo "========================================="
-          echo "Starting Brother Printer Fix for macOS 27"
-          echo "========================================="
-          
-          # Тук GitHub автоматично вгражда вашия софтуерен фикс
-          # Можете да поставите реалните команди под този ред:
-          sudo chmod -R 755 /usr/libexec/cups
-          
-          echo "Fix applied successfully! Please restart your Mac."
-          read -p "Press [Enter] to close this window..."
-          EOF
-          
-          chmod +x FixBrotherPrinters.command
+      - name: Make script executable
+        run: chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
 
-      - name: Upload Running Script
+      - name: Build DMG
+        run: hdiutil create -volname "Fix Brother Printers for macOS27" -srcfolder "Fix Brother Printers for macOS27.app" -ov -format UDZO "Fix Brother Printers for macOS27.dmg"
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: FixBrotherPrinters-script
-          path: FixBrotherPrinters.command
+          name: FixBrotherPrinters-dmg
+          path: "Fix Brother Printers for macOS27.dmg"
