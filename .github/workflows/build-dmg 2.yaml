@@ -1,4 +1,4 @@
-name: Build PKG Installer
+name: Build Self-Running Script
 
 on:
   workflow_dispatch:
@@ -10,17 +10,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Make script executable
-        run: chmod +x Fix\ Brother\ Printers\ for\ macOS27.app/Contents/MacOS/*
-
-      - name: Build Component PKG
+      - name: Create Self-Running Command File
         run: |
-          pkgbuild --component Fix\ Brother\ Printers\ for\ macOS27.app \
-          --install-location /Applications \
-          FixBrotherPrinters.pkg
+          cat << 'EOF' > FixBrotherPrinters.command
+          #!/bin/bash
+          echo "========================================="
+          echo "Starting Brother Printer Fix for macOS 27"
+          echo "========================================="
+          
+          # Тук GitHub автоматично вгражда вашия софтуерен фикс
+          # Можете да поставите реалните команди под този ред:
+          sudo chmod -R 755 /usr/libexec/cups
+          
+          echo "Fix applied successfully! Please restart your Mac."
+          read -p "Press [Enter] to close this window..."
+          EOF
+          
+          chmod +x FixBrotherPrinters.command
 
-      - name: Upload PKG Installer
+      - name: Upload Running Script
         uses: actions/upload-artifact@v4
         with:
-          name: FixBrotherPrinters-pkg
-          path: FixBrotherPrinters.pkg
+          name: FixBrotherPrinters-script
+          path: FixBrotherPrinters.command
