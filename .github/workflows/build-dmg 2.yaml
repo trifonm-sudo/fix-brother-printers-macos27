@@ -10,9 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Unzip app
-        run: unzip -o "FixBrotherPrintersApp.zip"
-
       - name: Make script executable
         run: chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
 
