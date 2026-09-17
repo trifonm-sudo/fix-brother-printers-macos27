@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# ---------------------------------------------------------------
+# Fix Brother Printers for macOS27
+# Automates steps 1-3 of the manual Rosetta 2 fix.
+# Step 4 (reinstalling the Brother driver) is left to the user,
+# but the app opens the correct Brother downloads search page.
+# ---------------------------------------------------------------
+
+BROTHER_URL="https://support.brother.com/g/b/productsearch.aspx?c=eu_ot&lang=en&content=dl"
+
+show_dialog() {
+    osascript -e "display dialog \"$1\" buttons {$2} default button (count of {$2}) with title \"Fix Brother Printers for macOS27\" with icon note" \
+        -e "button returned of result" 2>/dev/null
+}
+
+# --- Check if Rosetta is already installed ---
+if /usr/bin/pgrep oahd >/dev/null 2>&1; then
+    ALREADY_CHOICE=$(show_dialog "Rosetta 2 is already installed on this Mac. You can go ahead and try installing the Brother driver directly." "\"Close\",\"Open Brother's Page\"")
+    if [ "$ALREADY_CHOICE" = "Open Brother's Page" ]; then
+        open "$BROTHER_URL" 2>/dev/null
+    fi
+    exit 0
+fi
+
+# --- Step 1-2: explanation + install Rosetta ---
+ANSWER=$(show_dialog "We'll install Rosetta 2 — it's required for older Brother drivers to run on the new macOS.\\n\\nYou'll now be asked for your administrator password (the one you use to log in to your Mac)." "\"Cancel\",\"Install\"")
+
+if [ "$ANSWER" != "Install" ]; then
+    exit 0
+fi
+
+osascript -e 'do shell script "softwareupdate --install-rosetta --agree-to-license" with administrator privileges' 2>/tmp/fixbrother_err.log
+INSTALL_STATUS=$?
+
+if [ $INSTALL_STATUS -ne 0 ]; then
+    ERR=$(cat /tmp/fixbrother_err.log)
+    osascript -e "display dialog \"Installation failed: $ERR\\n\\nTry again, or install manually via Terminal:\\nsoftwareupdate --install-rosetta\" buttons {\"Close\"} with icon caution with title \"Fix Brother Printers for macOS27\""
+    exit 1
+fi
+
+# --- Step 3: restart ---
+RESTART_CHOICE=$(show_dialog "Rosetta 2 was installed successfully.\\n\\nYour Mac now needs to RESTART for it to take effect. Close any important files first." "\"I'll restart later\",\"Restart Now\"")
+
+if [ "$RESTART_CHOICE" = "Restart Now" ]; then
+    osascript -e 'tell application "System Events" to restart'
+    exit 0
+fi
+
+# --- Step 4: reminder + link to Brother ---
+FINAL_CHOICE=$(show_dialog "Don't forget: after restarting, try installing the original Brother driver (the one for older macOS) again — it should work now." "\"Close\",\"Open Brother's Page\"")
+
+if [ "$FINAL_CHOICE" = "Open Brother's Page" ]; then
+    open "$BROTHER_URL" 2>/dev/null
+fi
