@@ -1,4 +1,4 @@
-name: Build DMG
+name: Build PKG Installer
 
 on:
   workflow_dispatch:
@@ -7,20 +7,20 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Make script executable
         run: chmod +x Fix\ Brother\ Printers\ for\ macOS27.app/Contents/MacOS/*
 
-      - name: Ad-hoc sign the app
-        run: codesign --force --deep --sign - Fix\ Brother\ Printers\ for\ macOS27.app
+      - name: Build Component PKG
+        run: |
+          pkgbuild --component Fix\ Brother\ Printers\ for\ macOS27.app \
+          --install-location /Applications \
+          FixBrotherPrinters.pkg
 
-      - name: Build DMG
-        run: hdiutil create -volname "Fix Brother Printers for macOS27" -srcfolder Fix\ Brother\ Printers\ for\ macOS27.app -ov -format UDZO "Fix Brother Printers for macOS27.dmg"
-
-      - name: Upload DMG
+      - name: Upload PKG Installer
         uses: actions/upload-artifact@v4
         with:
-          name: FixBrotherPrinters-dmg
-          path: "Fix Brother Printers for macOS27.dmg"
+          name: FixBrotherPrinters-pkg
+          path: FixBrotherPrinters.pkg
