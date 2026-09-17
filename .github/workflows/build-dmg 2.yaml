@@ -10,11 +10,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Unzip app
-        run: unzip -o "FixBrotherPrintersApp.zip"
-
       - name: Make script executable
         run: chmod +x "Fix Brother Printers for macOS27.app/Contents/MacOS/run"
+
+      - name: Ad-hoc sign the app
+        run: codesign --force --deep --sign - "Fix Brother Printers for macOS27.app"
 
       - name: Build DMG
         run: hdiutil create -volname "Fix Brother Printers for macOS27" -srcfolder "Fix Brother Printers for macOS27.app" -ov -format UDZO "Fix Brother Printers for macOS27.dmg"
